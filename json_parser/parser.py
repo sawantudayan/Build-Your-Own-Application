@@ -4,6 +4,8 @@ import re
 # Token types
 TOKEN_LBRACE = 'LBRACE'
 TOKEN_RBRACE = 'RBRACE'
+TOKEN_LBRACKET = 'LBRACKET'
+TOKEN_RBRACKET = 'RBRACKET'
 TOKEN_COLON = 'COLON'
 TOKEN_COMMA = 'COMMA'
 TOKEN_STRING = 'STRING'
@@ -33,6 +35,12 @@ def lexer(input_str):
             advance()
         elif char == '}':
             yield (TOKEN_RBRACE, '}')
+            advance()
+        elif char == '[':
+            yield (TOKEN_LBRACKET, '[')
+            advance()
+        elif char == ']':
+            yield (TOKEN_RBRACKET, ']')
             advance()
         elif char == ':':
             yield (TOKEN_COLON, ':')
@@ -82,35 +90,66 @@ def lexer(input_str):
 
     yield (TOKEN_EOF, None)
 
-# Parser function: Parses tokens and checks for valid JSON objects with multiple data types
-def parser(input_str):
-    tokens = lexer(input_str)
+# Helper function: Parse an array
+def parse_array(tokens):
+    array_values = []
+    token = next(tokens)
+
+    if token[0] == TOKEN_LBRACKET:
+        token = next(tokens)
+
+        while token[0] != TOKEN_RBRACKET:
+            # Parse a value (can be any valid JSON data type)
+            value = parse_value(tokens, token)
+            array_values.append(value)
+
+            token = next(tokens)
+
+            if token[0] == TOKEN_COMMA:
+                token = next(tokens)
+            elif token[0] != TOKEN_RBRACKET:
+                print("Invalid JSON: Unexpected token")
+                sys.exit(1)
+
+        return array_values
+    else:
+        print("Invalid JSON: Expected opening bracket '['")
+        sys.exit(1)
+
+# Helper function: Parse a value (string, number, boolean, null, object, or array)
+def parse_value(tokens, token):
+    if token[0] == TOKEN_STRING:
+        return token[1]
+    elif token[0] == TOKEN_BOOLEAN:
+        return token[1]
+    elif token[0] == TOKEN_NULL:
+        return token[1]
+    elif token[0] == TOKEN_NUMBER:
+        return token[1]
+    elif token[0] == TOKEN_LBRACE:
+        return parse_object(tokens)
+    elif token[0] == TOKEN_LBRACKET:
+        return parse_array(tokens)
+    else:
+        print("Invalid JSON: Unexpected token")
+        sys.exit(1)
+
+# Helper function: Parse an object (key-value pairs)
+def parse_object(tokens):
+    obj = {}
     token = next(tokens)
 
     if token[0] == TOKEN_LBRACE:
         token = next(tokens)
 
-        # Parse key-value pairs
         while token[0] == TOKEN_STRING:
             key = token[1]
             token = next(tokens)
 
             if token[0] == TOKEN_COLON:
                 token = next(tokens)
-                # Check for string, boolean, null, or number as value
-                if token[0] == TOKEN_STRING:  # String value
-                    value = token[1]
-                elif token[0] == TOKEN_BOOLEAN:  # Boolean value
-                    value = token[1]
-                elif token[0] == TOKEN_NULL:  # Null value
-                    value = token[1]
-                elif token[0] == TOKEN_NUMBER:  # Numeric value
-                    value = token[1]
-                else:
-                    print("Invalid JSON: Expected a value")
-                    sys.exit(1)
-
-                print(f'Key: {key}, Value: {value}')
+                value = parse_value(tokens, token)
+                obj[key] = value
                 token = next(tokens)
 
                 # If there's a comma, continue parsing the next key-value pair
@@ -121,12 +160,39 @@ def parser(input_str):
                 else:
                     print("Invalid JSON: Unexpected token")
                     sys.exit(1)
-        
+
         if token[0] == TOKEN_RBRACE:
-            print("Valid JSON")
-            sys.exit(0)
+            return obj
         else:
             print("Invalid JSON: Expected closing brace '}'")
+            sys.exit(1)
+    else:
+        print("Invalid JSON: Expected opening brace '{'")
+        sys.exit(1)
+
+# Parser function: Parse the entire JSON structure
+def parser(input_str):
+    tokens = lexer(input_str)  # Generate the token stream
+    token_list = list(tokens)  # Capture all tokens in a list for printing
+
+    # Debugging: Print all tokens for troubleshooting
+    print("Tokens:", token_list)
+
+    # Now that we have captured all tokens, use the list to parse
+    token_iter = iter(token_list)  # Create an iterator from the token list
+    token = next(token_iter)
+
+    # Ensure the first token is a LBRACE (start of an object)
+    if token[0] == TOKEN_LBRACE:
+        result = parse_object(token_iter)
+
+        # Ensure that after parsing, no extra tokens are left
+        token = next(token_iter)
+        if token[0] == TOKEN_EOF:
+            print("Parsed JSON:", result)
+            sys.exit(0)
+        else:
+            print("Invalid JSON: Unexpected token after end of input")
             sys.exit(1)
     else:
         print("Invalid JSON: Expected opening brace '{'")
