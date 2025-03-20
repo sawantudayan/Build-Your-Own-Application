@@ -108,7 +108,7 @@ def parse_array(tokens):
             if token[0] == TOKEN_COMMA:
                 token = next(tokens)
             elif token[0] != TOKEN_RBRACKET:
-                print("Invalid JSON: Unexpected token")
+                print("Invalid JSON: Unexpected token in array")
                 sys.exit(1)
 
         return array_values
@@ -158,7 +158,7 @@ def parse_object(tokens):
                 elif token[0] == TOKEN_RBRACE:
                     break
                 else:
-                    print("Invalid JSON: Unexpected token")
+                    print("Invalid JSON: Unexpected token in object")
                     sys.exit(1)
 
         if token[0] == TOKEN_RBRACE:
@@ -182,21 +182,16 @@ def parser(input_str):
     token_iter = iter(token_list)  # Create an iterator from the token list
     token = next(token_iter)
 
-    # Ensure the first token is a LBRACE (start of an object)
-    if token[0] == TOKEN_LBRACE:
-        result = parse_object(token_iter)
+    # Start parsing the first value (could be object, array, etc.)
+    result = parse_value(token_iter, token)
 
-        # Ensure that after parsing, no extra tokens are left
-        token = next(token_iter)
-        if token[0] == TOKEN_EOF:
-            print("Parsed JSON:", result)
-            sys.exit(0)
-        else:
-            print("Invalid JSON: Unexpected token after end of input")
-            sys.exit(1)
-    else:
-        print("Invalid JSON: Expected opening brace '{'")
+    # Ensure that the token stream ends with EOF
+    token = next(token_iter, None)
+    if token and token[0] != TOKEN_EOF:
+        print("Invalid JSON: Unexpected token after parsing ends")
         sys.exit(1)
+
+    print("Parsed JSON:", result)
 
 if __name__ == "__main__":
     input_json = input("Enter JSON: ")
