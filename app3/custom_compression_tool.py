@@ -10,7 +10,8 @@ The tool provides functionality to:
 - Decode a Huffman encoded string back to its original form.
 
 Classes:
-- Node: A class representing a node in the Huffman tree, which stores a character, its frequency, and pointers to its left and right children.
+- Node: A class representing a node in the Huffman tree, which stores a character, 
+  its frequency, and pointers to its left and right children.
 
 Functions:
 - build_huffman_tree: Builds the Huffman tree based on character frequencies.
