@@ -5,6 +5,16 @@ from dotenv import load_dotenv
 # Load the .env file to read environment variables
 load_dotenv()
 
+"""
+This script provides functionality for counting various file statistics:
+- bytes
+- lines
+- words
+- characters
+
+It reads a file or standard input and returns the count based on the option provided.
+"""
+
 def count_bytes(filename):
     """Returns the byte count of the file."""
     if not os.path.exists(filename):
@@ -12,6 +22,7 @@ def count_bytes(filename):
         sys.exit(1)
     with open(filename, 'rb') as f:
         return len(f.read())
+
 
 def count_lines(filename):
     """Returns the line count of the file."""
@@ -22,6 +33,7 @@ def count_lines(filename):
     # Open the file with UTF-8 encoding and handle errors gracefully
     with open(filename, 'r', encoding='utf-8', errors='ignore') as f:
         return len(f.readlines())
+
 
 def count_words(filename):
     """Returns the word count of the file."""
@@ -41,6 +53,7 @@ def count_characters(filename):
         sys.exit(1)
     with open(filename, 'r', encoding='utf-8') as f:
         return sum(len(line) for line in f)
+
 
 def process_input():
     """Main function to handle command-line arguments and run the tool."""
@@ -77,7 +90,9 @@ def process_input():
         count_lines_result = count_lines(filename) if filename else sum(1 for line in sys.stdin)
         count_words_result = count_words(filename) if filename else sum(len(line.split()) for line in sys.stdin)
         count_bytes_result = count_bytes(filename) if filename else sum(len(line.encode()) for line in sys.stdin)
-        print(f"{count_lines_result} {count_words_result} {count_bytes_result} {filename}" if filename else f"{count_lines_result} {count_words_result} {count_bytes_result}")
+        print(f"{count_lines_result} {count_words_result} {count_bytes_result} {filename}" if filename
+              else f"{count_lines_result} {count_words_result} {count_bytes_result}")
+
 
 if __name__ == "__main__":
     process_input()
