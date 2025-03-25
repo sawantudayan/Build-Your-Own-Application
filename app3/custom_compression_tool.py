@@ -1,8 +1,23 @@
 import heapq
 
-# This module implements a custom compression tool using Huffman coding.
-# It provides functionality to build a Huffman tree, generate Huffman codes,
-# encode a string, and decode a Huffman encoded string.
+"""
+This module implements a custom compression tool using Huffman coding.
+
+The tool provides functionality to:
+- Build a Huffman tree from a set of characters and their frequencies.
+- Generate Huffman codes for each character in the tree.
+- Encode a string using the generated Huffman codes.
+- Decode a Huffman encoded string back to its original form.
+
+Classes:
+- Node: A class representing a node in the Huffman tree, which stores a character, its frequency, and pointers to its left and right children.
+
+Functions:
+- build_huffman_tree: Builds the Huffman tree based on character frequencies.
+- generate_codes: Recursively generates Huffman codes for each character in the tree.
+- encode: Encodes a string using the provided Huffman codebook.
+- decode: Decodes a Huffman encoded string using the root of the Huffman tree.
+"""
 
 class Node:
     """
