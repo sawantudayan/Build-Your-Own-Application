@@ -1,5 +1,11 @@
 import heapq
 
+"""
+This module implements a custom compression tool using Huffman coding.
+It provides functionality to build a Huffman tree, generate Huffman codes,
+encode a string, and decode a Huffman encoded string.
+"""
+
 class Node:
     """
     A class representing a node in the Huffman tree.
@@ -16,6 +22,12 @@ class Node:
         This method ensures that nodes can be compared by their frequency.
         """
         return self.freq < other.freq
+
+    def __str__(self):
+        """
+        String representation of the node for debugging or visualization.
+        """
+        return f"Node(char={self.char}, freq={self.freq})"
 
 def build_huffman_tree(frequencies):
     """
