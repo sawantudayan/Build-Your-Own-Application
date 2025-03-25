@@ -1,4 +1,5 @@
 import heapq
+import sys
 
 class Node:
     """
@@ -71,10 +72,11 @@ def decode(encoded_string, root):
 
     return ''.join(decoded_string)
 
-# Sample usage of the application
-if __name__ == "__main__":
-    input_string = "this is an example for huffman encoding"
-    
+def main(input_string):
+    """
+    Main function that takes an input string, builds the Huffman tree, encodes the string,
+    and decodes it back to the original text.
+    """
     # Frequency calculation
     frequencies = {char: input_string.count(char) for char in set(input_string)}
 
@@ -91,3 +93,11 @@ if __name__ == "__main__":
     # Decode the encoded string
     decoded_string = decode(encoded_string, root)
     print(f"Decoded: {decoded_string}")
+
+if __name__ == "__main__":
+    # Take input string from command line argument
+    if len(sys.argv) != 2:
+        print("Usage: python huffman_coding.py '<input_string>'")
+    else:
+        input_string = sys.argv[1]
+        main(input_string)
